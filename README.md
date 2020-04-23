@@ -12,6 +12,6 @@ flutter 结合yii2
 2.api后台升级☑  
 3.登录☐  
 4.对接elastic接口☑  
-5.用sqflite 缓存☐  
+5.用dio缓存 ☑  
 6.分层☑  
 7.扫码登录☐  
