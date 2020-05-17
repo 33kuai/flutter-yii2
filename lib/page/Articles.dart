@@ -23,7 +23,7 @@ class _ArticlesState extends State<Articles>
   @override
   void initState() {
     super.initState();
-    _futureBuilderFuture = NetData.getCategory();
+    _futureBuilderFuture = NetData.getCategory(context);
   }
 
   @override
@@ -61,6 +61,7 @@ class _ArticlesState extends State<Articles>
             child: new Scaffold(
               appBar: PreferredSize(
                 child: new AppBar(
+                  
                     bottom: new TabBar(
                   tabs: tabList,
                   isScrollable: true,
@@ -68,10 +69,25 @@ class _ArticlesState extends State<Articles>
                 preferredSize: Size.fromHeight(50.0),
               ),
               body: new TabBarView(
-                  children: _categories.map((cate) {
+
+
+                  children: 
+                  // tabList.map((e){
+
+
+                  // }).toList()
+                  
+                  _categories.map((cate) {
                    // print(cate.title);
-                return Center(child: new ArticleList(category: cate.id));
-              }).toList()),
+                return Center(child: new ArticleList(
+                  
+                  
+                  key: new PageStorageKey<int>(cate.id),
+                  category: cate.id));
+              }).toList()
+              
+              
+              ),
             ));
         break;
       default:

@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zuxianzhi/main.dart';
-
+import 'package:zuxianzhi/utils/netData.dart';
+import 'package:provider/provider.dart';
+import '../provider/user.dart';
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() {
@@ -25,10 +22,10 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
 
     _pwdEditController = TextEditingController.fromValue(TextEditingValue(
-      text: 'webmaster'
+      text: 'demodemo'
     ));
     _userNameEditController = TextEditingController.fromValue(TextEditingValue(
-      text: 'webmaster'
+      text: 'demo'
     ));
 
     _pwdEditController.addListener(() => setState(() => {}));
@@ -172,37 +169,28 @@ class _LoginPageState extends State<LoginPage> {
     String username = _userNameEditController.text;
     String password = _pwdEditController.text;
    
-//远程
     
-    login(username, password).then((login) {
+    NetData.doLogin(username,password).then((login) {
+
+      NetData.getProfile2().then((value) {
+      final user = Provider.of<User>(context,listen: false);
+      user.setProfile(value);
+    });
+
+//print(login);
+  
       Fluttertoast.showToast(
           msg: "登录成功",
           gravity: ToastGravity.CENTER,
           textColor: Colors.white,
           fontSize: 14.0);
-      Navigator.of(context).push(new MaterialPageRoute(builder: (_) {
-        return MyApp();
-      }));
+          Navigator.pop(context);
+      // Navigator.of(context).push(new MaterialPageRoute(builder: (_) {
+      //   return MyApp();
+      // }));
     });
 
     return true;
   }
 
-  static Future login(String username,String password) async {
-    Dio dio = new Dio();
-
-    Response response;
- 
-    try {
-      var url = 'http://api.zuxianzhi.com/login';
-      response = await dio
-          .post(url, data: {"username": username, "password": password});
-      var token = jsonDecode(response.data);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('token', token['token']);
-      return token['token'];
-    } catch (err) {
-      return err.toString();
-    }
-  }
 }

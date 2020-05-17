@@ -11,33 +11,24 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   TextEditingController _searchController;
 
-
-  List suggest=[];
+  List suggest = [];
   var result;
 
-
-  void getSuggest(String keyword){
-
-      NetData.getMovieList(keyword).then((value){
-        if(this.mounted){
-           
-          setState(() {
-            suggest = value;
-          });
-        }
-      });
+  void getSuggest(String keyword) {
+    NetData.getMovieList(keyword).then((value) {
+      if (this.mounted) {
+        setState(() {
+          suggest = value;
+        });
+      }
+    });
   }
 
-
-  void getResult(){
-
-
-  }
+  void getResult() {}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
         body: Container(
             margin: EdgeInsets.only(top: 20),
             padding: EdgeInsets.all(20),
@@ -48,11 +39,26 @@ class _SearchState extends State<Search> {
                   child: TextField(
                     textInputAction: TextInputAction.search,
                     decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.search),
-                        fillColor: Colors.white,
-                        filled: true,
-                        //labelText: '搜索'
-                        ),
+                      prefixIcon: Icon(Icons.search),
+                      fillColor: Colors.white,
+                      filled: true,
+                      labelText: '搜索',
+                      
+                     // border: InputBorder.none,
+       // focusedBorder: InputBorder.none,
+       // enabledBorder: InputBorder.none,
+       // errorBorder: InputBorder.none,
+       // disabledBorder: InputBorder.none,
+
+      //  border: InputBorder.none,
+      //   focusedBorder: InputBorder.none,
+      //   enabledBorder: InputBorder.none,
+      //   errorBorder: InputBorder.none,
+      //   disabledBorder: InputBorder.none,
+      //   contentPadding:  EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
+      //    hintText: 'sssss'
+       // hintText: sLabel
+                    ),
                     controller: _searchController,
                     onChanged: (value) {
                       getSuggest(value);
@@ -65,21 +71,23 @@ class _SearchState extends State<Search> {
                   child: Container(
                       padding: EdgeInsets.only(top: 1),
                       child: new ListView.builder(
-                       itemCount: suggest.length,
-                       itemBuilder: (context,item){
-
-                         return  ListTile(
-                           leading: Text(suggest[item].star),
-                           title:Text(suggest[item].name),
-                           subtitle: Text(suggest[item].type),
-                           trailing: Text(suggest[item].directors),
-
-                         );
-                         
-                       },
+                        itemCount: suggest.length,
+                        itemBuilder: (context, item) {
+                          return ListTile(
+                            leading: Text(suggest[item].star),
+                            title: Text(suggest[item].name),
+                            subtitle: Text(suggest[item].type),
+                            trailing: Text(suggest[item].directors),
+                          );
+                        },
                       )),
                 ),
               ],
             )));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

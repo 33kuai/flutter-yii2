@@ -2,23 +2,34 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:jpush_flutter/jpush_flutter.dart';
-import 'package:zuxianzhi/page/Detail.dart';
-import 'package:zuxianzhi/page/Home.dart';
+//import 'package:zuxianzhi/views/Home.dart';
 import 'package:provider/provider.dart';
+import 'package:zuxianzhi/page/AnimatedIconDemo.dart';
+import 'package:zuxianzhi/page/Demo.dart';
 import 'package:zuxianzhi/page/Profile.dart';
+import 'package:zuxianzhi/views/content/detail.dart';
+import 'package:zuxianzhi/views/content/ArticleList.dart';
+// import 'package:zuxianzhi/page/Login.dart';
+// import 'package:zuxianzhi/page/Profile.dart';
 import 'package:zuxianzhi/page/Search.dart';
-import 'package:zuxianzhi/provider/data.dart';
+import 'package:zuxianzhi/page/Setting.dart';
+import 'package:zuxianzhi/provider/articleProvider.dart';
+import 'package:zuxianzhi/provider/user.dart';
+import 'package:zuxianzhi/views/content/article_detial.dart';
 import 'page/Home.dart';
 import 'package:flutter_xupdate/flutter_xupdate.dart';
 import 'dart:io';
 import 'package:badges/badges.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+// import 'package:zuxianzhi/views/content/ArticleDetail.dart';
 void main() {
   runApp(new MyApp());
 // 以下两行 设置android状态栏为透明的沉浸。写在组件渲染之后，是为了在渲染后进行set赋值，覆盖状态栏，写在渲染之前MaterialApp组件会覆盖掉这个值。
-  // SystemUiOverlayStyle systemUiOverlayStyle =
-  //     SystemUiOverlayStyle(statusBarColor: Colors.transparent);
-  // SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  SystemUiOverlayStyle systemUiOverlayStyle =
+      SystemUiOverlayStyle(statusBarColor: Colors.transparent);
+  SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
 }
 
 class MyApp extends StatefulWidget {
@@ -86,6 +97,8 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     jpush.getRegistrationID().then((rid) {
       print("flutter get registration id : $rid");
+
+      _savePushRid(rid);
       setState(() {
         debugLable = "flutter getRegistrationID: $rid";
       });
@@ -101,18 +114,28 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  //记录本机id，登录时上传，单独推送需要
+  _savePushRid(ridData) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String rid = prefs.getString('rid');
+    if (rid == null) {
+      await prefs.setString('rid', ridData);
+    }
+  }
+
   var _pageController = PageController();
 
   //默认显示第一个tab标签
   int _tabIndex = 0;
 
-  //标签列表
-  final _pageList = [
-    Home(),
-    Search(),
-    Profile(),
-    //Setting(),
-  ];
+  // //标签列表
+  // final _pageList = [
+  //   Home(),
+  //   Search(),
+  //   Setting(),
+  //   // ArticleDetail(),
+  //   //  LoginPage(),
+  // ];
 
   String _updateUrl = "http://api.zuxianzhi.com/v1/release";
   void checkUpdate() {
@@ -180,19 +203,51 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider(create: (_) => Data()),
+        ChangeNotifierProvider(create: (_) => ArticleProvider()),
+        ChangeNotifierProvider(create: (_) => User()),
       ],
       child: MaterialApp(
+
+        localeResolutionCallback: (deviceLocale, supportedLocales) {
+        print('deviceLocale: $deviceLocale');//判断操作系统语言
+        return ;
+      },
+        theme: ThemeData(
+          primaryColor: Colors.purple,
+          appBarTheme:  AppBarTheme(
+            color: Colors.green
+            
+          )
+          // primaryColorLight:Colors.green,
+          //  accentColor: Colors.green,
+          //  textTheme: TextTheme(bodyText2: TextStyle(color: Colors.purple)),
+        ),
+       // color: Colors.red,
+        localizationsDelegates: [
+          // ... app-specific localization delegate[s] here
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale('en'),
+          const Locale.fromSubtags(languageCode: 'zh'),
+        ],
         debugShowCheckedModeBanner: false,
         locale: Locale('zh', 'cn'),
         home: Scaffold(
-            body: PageView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                //禁止页面左右滑动切换
-                controller: _pageController,
-                onPageChanged: _pageChanged,
-                itemCount: _pageList.length,
-                itemBuilder: (context, index) => _pageList[index]),
+            body: IndexedStack(
+              index: _tabIndex,
+              children: <Widget>[
+                
+               // ArticleList(category: 2,),
+                Home(),
+                Search(),
+                Profile(),
+                AnimatedIconPage(),
+                
+              ],
+            ),
             bottomNavigationBar: BottomNavigationBar(
               // iconSize: 20,
               // selectedFontSize: 10,
@@ -204,25 +259,24 @@ class _MyAppState extends State<MyApp> {
                 BottomNavigationBarItem(
                     icon: Badge(
                       shape: BadgeShape.circle,
-                      borderRadius: 100,
-                      child: Icon(Icons.settings),
-                      badgeContent: Container(
-                        height: 5,
-                        width: 5,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle, color: Colors.white),
-                      ),
+                      padding: EdgeInsets.all(5),
+                
+                      child: Icon(Icons.person),
+                      badgeContent: Text('4',style: TextStyle(color:Colors.white,fontSize: 10),),
                     ),
-                    title: Text('个人中心')),
+                    title: Text('我的')),
+
+                     BottomNavigationBarItem(
+                    icon: Icon(Icons.home), title: Text('测试')),
               ],
               currentIndex: _tabIndex,
               type: BottomNavigationBarType.fixed,
               //  iconSize: 30.0,
               onTap: (int index) {
-                _pageController.jumpToPage(index);
+               _pageChanged(index);
               },
             )),
-        routes: {'/detail': (context) => Detail()},
+        //routes: {'/detail': (context) => Detail()},
       ),
     );
   }

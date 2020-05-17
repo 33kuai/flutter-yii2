@@ -8,7 +8,6 @@ part of 'movie.dart';
 
 Movie _$MovieFromJson(Map<String, dynamic> json) {
   return Movie(
-    
     json['name'] as String,
     json['type'] as String,
     json['star'] as String,
@@ -22,7 +21,6 @@ Movie _$MovieFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$MovieToJson(Movie instance) => <String, dynamic>{
-       
       'name': instance.name,
       'type': instance.type,
       'star': instance.star,
