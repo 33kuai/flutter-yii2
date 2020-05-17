@@ -1,16 +1,17 @@
-# zuxianzhi
+# 跬步app
 
-A new Flutter project.
+flutter 结合yii2
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+记录开发过程中的问题和经验 
 
-A few resources to get you started if this is your first Flutter project:
+功能
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1.极光推送 ☑  
+2.api后台升级☑  
+3.登录☐  
+4.对接elastic接口☑  
+5.用dio缓存 ☑  
+6.分层☑  
+7.扫码登录☐  
